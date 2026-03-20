@@ -1,0 +1,92 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.75rem;
+    /* Deep navy background: #0B1220 */
+    --background: 0.14 0.028 243;
+    /* Light text: #E7E9EE */
+    --foreground: 0.93 0.008 243;
+    /* Card bg: #2B2F36 */
+    --card: 0.22 0.008 240;
+    --card-foreground: 0.93 0.008 243;
+    --popover: 0.19 0.028 243;
+    --popover-foreground: 0.93 0.008 243;
+    /* Gold accent: #C9A35A */
+    --primary: 0.72 0.11 74;
+    /* Button text on gold: near-black */
+    --primary-foreground: 0.13 0.006 243;
+    --secondary: 0.22 0.008 240;
+    --secondary-foreground: 0.93 0.008 243;
+    --muted: 0.19 0.028 243;
+    /* Muted text: #A7AFBD */
+    --muted-foreground: 0.72 0.015 243;
+    /* Gold accent */
+    --accent: 0.72 0.11 74;
+    --accent-foreground: 0.13 0.006 243;
+    --destructive: 0.577 0.245 27.325;
+    --destructive-foreground: 0.985 0 0;
+    /* Border: #1E2A3A */
+    --border: 0.22 0.028 243;
+    --input: 0.22 0.028 243;
+    --ring: 0.72 0.11 74;
+    --chart-1: 0.646 0.222 41.116;
+    --chart-2: 0.6 0.118 184.704;
+    --chart-3: 0.398 0.07 227.392;
+    --chart-4: 0.828 0.189 84.429;
+    --chart-5: 0.769 0.188 70.08;
+    --sidebar: 0.14 0.028 243;
+    --sidebar-foreground: 0.93 0.008 243;
+    --sidebar-primary: 0.72 0.11 74;
+    --sidebar-primary-foreground: 0.13 0.006 243;
+    --sidebar-accent: 0.22 0.008 240;
+    --sidebar-accent-foreground: 0.93 0.008 243;
+    --sidebar-border: 0.22 0.028 243;
+    --sidebar-ring: 0.72 0.11 74;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: "Playfair Display", serif;
+  }
+}
+
+@layer utilities {
+  .font-serif {
+    font-family: "Playfair Display", serif;
+  }
+  .font-sans {
+    font-family: "Inter", sans-serif;
+  }
+  .text-gold {
+    color: oklch(0.72 0.11 74);
+  }
+  .bg-navy {
+    background-color: oklch(0.14 0.028 243);
+  }
+  .bg-card-dark {
+    background-color: oklch(0.22 0.008 240);
+  }
+  .border-gold {
+    border-color: oklch(0.72 0.11 74);
+  }
+}
