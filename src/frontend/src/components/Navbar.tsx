@@ -1,8 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "@tanstack/react-router";
-import { GraduationCap, LogOut, Menu, User, X } from "lucide-react";
+import {
+  CheckCheck,
+  Copy,
+  GraduationCap,
+  LogOut,
+  Menu,
+  User,
+  X,
+} from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useInternetIdentity } from "../hooks/useInternetIdentity";
 import AuthModal from "./AuthModal";
 
@@ -20,15 +29,26 @@ export default function Navbar() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [authModal, setAuthModal] = useState<"login" | "signup" | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const isAuthenticated = !!identity;
-  const principalShort = identity
-    ? `${identity.getPrincipal().toString().slice(0, 10)}...`
+  const fullPrincipal = identity ? identity.getPrincipal().toString() : null;
+  const principalShort = fullPrincipal
+    ? `${fullPrincipal.slice(0, 10)}...`
     : null;
 
   const handleLogout = async () => {
     await clear();
     queryClient.clear();
+  };
+
+  const handleCopyPrincipal = () => {
+    if (!fullPrincipal) return;
+    navigator.clipboard.writeText(fullPrincipal).then(() => {
+      setCopied(true);
+      toast.success("Principal ID copied!");
+      setTimeout(() => setCopied(false), 2500);
+    });
   };
 
   return (
@@ -79,11 +99,27 @@ export default function Navbar() {
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                   <User className="w-4 h-4" />
                   <span className="font-sans">{principalShort}</span>
                 </div>
+                <button
+                  type="button"
+                  onClick={handleCopyPrincipal}
+                  title="Copy full Principal ID"
+                  className="flex items-center justify-center w-7 h-7 rounded-md transition-colors hover:bg-white/10"
+                  data-ocid="nav.copy_principal.button"
+                >
+                  {copied ? (
+                    <CheckCheck
+                      className="w-3.5 h-3.5"
+                      style={{ color: "oklch(0.65 0.18 145)" }}
+                    />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                  )}
+                </button>
                 <Button
                   variant="outline"
                   size="sm"
@@ -154,15 +190,41 @@ export default function Navbar() {
               </Link>
             ))}
             {isAuthenticated ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleLogout}
-                className="border-border text-foreground hover:bg-card font-sans w-full"
-                data-ocid="nav.logout.button"
-              >
-                <LogOut className="w-4 h-4 mr-1" /> Logout
-              </Button>
+              <div className="flex flex-col gap-2">
+                {fullPrincipal && (
+                  <button
+                    type="button"
+                    onClick={handleCopyPrincipal}
+                    className="flex items-center gap-2 text-sm text-muted-foreground px-3 py-2 rounded-lg border w-full text-left"
+                    style={{
+                      borderColor: "oklch(0.28 0.028 243)",
+                      backgroundColor: "oklch(0.16 0.02 243)",
+                    }}
+                    data-ocid="nav.copy_principal.mobile_button"
+                  >
+                    {copied ? (
+                      <CheckCheck
+                        className="w-4 h-4 shrink-0"
+                        style={{ color: "oklch(0.65 0.18 145)" }}
+                      />
+                    ) : (
+                      <Copy className="w-4 h-4 shrink-0" />
+                    )}
+                    <span className="font-sans truncate">
+                      {copied ? "Copied!" : `Copy ID: ${principalShort}`}
+                    </span>
+                  </button>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="border-border text-foreground hover:bg-card font-sans w-full"
+                  data-ocid="nav.logout.button"
+                >
+                  <LogOut className="w-4 h-4 mr-1" /> Logout
+                </Button>
+              </div>
             ) : (
               <div className="flex flex-col gap-2">
                 <Button

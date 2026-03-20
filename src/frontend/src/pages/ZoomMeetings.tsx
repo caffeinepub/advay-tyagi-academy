@@ -1,7 +1,20 @@
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
-import { ExternalLink, Lock, Video } from "lucide-react";
-import { motion } from "motion/react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  HelpCircle,
+  Lock,
+  Mail,
+  MessageCircle,
+  Send,
+  Video,
+} from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import AuthModal from "../components/AuthModal";
 import { useActor } from "../hooks/useActor";
@@ -39,8 +52,7 @@ function getMonthLabel(ns: bigint): string {
 }
 
 function getPlaceholderMeetings(): ZoomMeeting[] {
-  // First meeting: real March 2026 session
-  const march = new Date(2026, 2, 20, 18, 0, 0); // March 20, 2026
+  const march = new Date(2026, 2, 20, 18, 0, 0);
   const april = new Date(2026, 3, 15, 18, 0, 0);
   const may = new Date(2026, 4, 15, 18, 0, 0);
 
@@ -75,6 +87,346 @@ function getPlaceholderMeetings(): ZoomMeeting[] {
   ];
 }
 
+const faqs = [
+  {
+    question: "Will Advay be taking the class himself?",
+    answer: "Yes, all sessions are conducted by Advay Tyagi himself.",
+  },
+  {
+    question: "Will I get free e-books with my subscription?",
+    answer:
+      "Yes, you get free e-books included with your \u20b9500/year subscription.",
+  },
+  {
+    question: "How will I know about new meetings?",
+    answer:
+      "Visit the Zoom Meetings tab on the website \u2014 all upcoming sessions are listed there with dates and links.",
+  },
+  {
+    question: "What is the membership fee?",
+    answer:
+      "The membership is \u20b9500 per year, giving you access to all monthly live sessions and free e-books.",
+  },
+  {
+    question: "How do I pay for the membership?",
+    answer:
+      "Pay via UPI to 9582376290@ptaxis. After payment, share your name (the name you will use to join the Zoom meeting) and a screenshot of the payment on WhatsApp at 9220561379.",
+  },
+  {
+    question: "How do I join a Zoom meeting?",
+    answer:
+      'Click the "Join Meeting" button and the Zoom app will open automatically. Make sure you have Zoom installed.',
+  },
+  {
+    question: "What happens in the monthly sessions?",
+    answer:
+      "Each session includes a live Q&A, current affairs deep-dive, and strategic geopolitics discussion with Advay Tyagi. Sessions typically run 60\u201390 minutes.",
+  },
+  {
+    question: "Can I access recordings of past sessions?",
+    answer:
+      "Recordings may be shared with members at the discretion of Advay Tyagi Academy. Stay tuned to the platform for any updates on recorded content.",
+  },
+];
+
+function FAQItem({
+  question,
+  answer,
+  index,
+}: { question: string; answer: string; index: number }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.07 }}
+      className="rounded-2xl border overflow-hidden"
+      style={{
+        backgroundColor: "oklch(0.22 0.008 240)",
+        borderColor: open
+          ? "oklch(0.72 0.11 74 / 0.5)"
+          : "oklch(0.28 0.028 243)",
+        transition: "border-color 0.2s ease",
+      }}
+      data-ocid={`faq.item.${index + 1}`}
+    >
+      <button
+        type="button"
+        className="w-full flex items-center gap-4 p-5 text-left group"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+      >
+        <div
+          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+          style={{ backgroundColor: "oklch(0.72 0.11 74 / 0.12)" }}
+        >
+          <HelpCircle
+            className="w-4 h-4"
+            style={{ color: "oklch(0.72 0.11 74)" }}
+          />
+        </div>
+        <span className="flex-1 font-serif text-base font-semibold text-foreground group-hover:text-gold transition-colors">
+          {question}
+        </span>
+        <div
+          className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: "oklch(0.72 0.11 74 / 0.1)" }}
+        >
+          {open ? (
+            <ChevronUp
+              className="w-4 h-4"
+              style={{ color: "oklch(0.72 0.11 74)" }}
+            />
+          ) : (
+            <ChevronDown
+              className="w-4 h-4"
+              style={{ color: "oklch(0.72 0.11 74)" }}
+            />
+          )}
+        </div>
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="content"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
+            <div
+              className="px-5 pb-5 pt-1 text-sm font-sans text-muted-foreground leading-relaxed"
+              style={{ borderTop: "1px solid oklch(0.28 0.028 243)" }}
+            >
+              {answer}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+function FeedbackForm() {
+  const [name, setName] = useState("");
+  const [message, setMessage] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+    const displayName = name.trim() || "Anonymous";
+    const text = `Feedback from ${displayName}: ${message.trim()}`;
+    const url = `https://wa.me/919220561379?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+    setSubmitted(true);
+    setName("");
+    setMessage("");
+    setTimeout(() => setSubmitted(false), 4000);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: faqs.length * 0.07 + 0.25 }}
+      className="mt-5 rounded-2xl border p-6"
+      style={{
+        backgroundColor: "oklch(0.22 0.008 240)",
+        borderColor: "oklch(0.28 0.028 243)",
+      }}
+      data-ocid="faq.feedback.card"
+    >
+      <div className="flex items-center gap-3 mb-1">
+        <div
+          className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+          style={{ backgroundColor: "oklch(0.72 0.11 74 / 0.12)" }}
+        >
+          <MessageCircle
+            className="w-4 h-4"
+            style={{ color: "oklch(0.72 0.11 74)" }}
+          />
+        </div>
+        <h3 className="font-serif text-xl font-bold text-foreground">
+          Share Your Feedback
+        </h3>
+      </div>
+      <p className="text-sm text-muted-foreground font-sans mb-5 ml-12">
+        Your feedback helps improve the academy. We&apos;d love to hear from
+        you.
+      </p>
+
+      <AnimatePresence>
+        {submitted && (
+          <motion.div
+            key="success"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.25 }}
+            className="flex items-center gap-3 rounded-xl px-4 py-3 mb-4"
+            style={{
+              backgroundColor: "oklch(0.55 0.18 145 / 0.12)",
+              border: "1px solid oklch(0.55 0.18 145 / 0.3)",
+            }}
+            data-ocid="faq.feedback.success_state"
+          >
+            <CheckCircle2
+              className="w-4 h-4 shrink-0"
+              style={{ color: "oklch(0.65 0.18 145)" }}
+            />
+            <span
+              className="text-sm font-sans font-medium"
+              style={{ color: "oklch(0.75 0.14 145)" }}
+            >
+              Thanks for your feedback!
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Your name (optional)"
+          className="w-full rounded-xl px-4 py-3 text-sm font-sans text-foreground placeholder:text-muted-foreground/60 outline-none focus:ring-2 transition-all"
+          style={{
+            backgroundColor: "oklch(0.19 0.028 243)",
+            border: "1px solid oklch(0.28 0.028 243)",
+          }}
+          data-ocid="faq.feedback.input"
+        />
+        <textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Write your feedback or suggestions..."
+          rows={4}
+          required
+          className="w-full rounded-xl px-4 py-3 text-sm font-sans text-foreground placeholder:text-muted-foreground/60 outline-none focus:ring-2 transition-all resize-none"
+          style={{
+            backgroundColor: "oklch(0.19 0.028 243)",
+            border: "1px solid oklch(0.28 0.028 243)",
+          }}
+          data-ocid="faq.feedback.textarea"
+        />
+        <div className="flex justify-end">
+          <Button
+            type="submit"
+            disabled={!message.trim()}
+            className="bg-gold text-primary-foreground hover:bg-gold-light font-sans font-semibold rounded-full px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+            data-ocid="faq.feedback.submit_button"
+          >
+            <Send className="w-3.5 h-3.5 mr-2" />
+            Send Feedback
+          </Button>
+        </div>
+      </form>
+    </motion.div>
+  );
+}
+
+function FAQsView() {
+  return (
+    <section className="px-4 sm:px-6 max-w-3xl mx-auto mt-10">
+      <div className="flex flex-col gap-3">
+        {faqs.map((faq, i) => (
+          <FAQItem
+            key={faq.question}
+            question={faq.question}
+            answer={faq.answer}
+            index={i}
+          />
+        ))}
+      </div>
+
+      {/* Contact card */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: faqs.length * 0.07 + 0.1 }}
+        className="mt-6 rounded-2xl border p-6"
+        style={{
+          backgroundColor: "oklch(0.22 0.008 240)",
+          borderColor: "oklch(0.28 0.028 243)",
+        }}
+        data-ocid="faq.contact.card"
+      >
+        <h3 className="font-serif text-xl font-bold text-foreground mb-1">
+          Still have questions?
+        </h3>
+        <p className="text-sm text-muted-foreground font-sans mb-5">
+          Reach out to us directly.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <a
+            href="https://wa.me/919220561379"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 rounded-xl border px-4 py-3 transition-colors hover:border-gold/50 group"
+            style={{
+              backgroundColor: "oklch(0.19 0.028 243)",
+              borderColor: "oklch(0.28 0.028 243)",
+            }}
+            data-ocid="faq.whatsapp.link"
+          >
+            <div
+              className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+              style={{ backgroundColor: "oklch(0.55 0.18 145 / 0.15)" }}
+            >
+              <MessageCircle
+                className="w-4 h-4"
+                style={{ color: "oklch(0.65 0.18 145)" }}
+              />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground font-sans">
+                WhatsApp
+              </p>
+              <p className="text-sm font-sans font-semibold text-foreground group-hover:text-gold transition-colors">
+                9220561379
+              </p>
+            </div>
+          </a>
+          <a
+            href="mailto:advaytyagi55@gmail.com"
+            className="flex items-center gap-3 rounded-xl border px-4 py-3 transition-colors hover:border-gold/50 group"
+            style={{
+              backgroundColor: "oklch(0.19 0.028 243)",
+              borderColor: "oklch(0.28 0.028 243)",
+            }}
+            data-ocid="faq.email.link"
+          >
+            <div
+              className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+              style={{ backgroundColor: "oklch(0.72 0.11 74 / 0.12)" }}
+            >
+              <Mail
+                className="w-4 h-4"
+                style={{ color: "oklch(0.72 0.11 74)" }}
+              />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground font-sans">Email</p>
+              <p className="text-sm font-sans font-semibold text-foreground group-hover:text-gold transition-colors">
+                advaytyagi55@gmail.com
+              </p>
+            </div>
+          </a>
+        </div>
+      </motion.div>
+
+      {/* Feedback form card */}
+      <FeedbackForm />
+
+      <div className="pb-8" />
+    </section>
+  );
+}
+
 function MeetingsView() {
   const { actor, isFetching } = useActor();
 
@@ -105,7 +457,40 @@ function MeetingsView() {
   );
 
   return (
-    <section className="px-4 sm:px-6 max-w-4xl mx-auto mt-14">
+    <section className="px-4 sm:px-6 max-w-4xl mx-auto mt-6">
+      {/* Payment notice banner */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="rounded-2xl border flex gap-4 items-start p-5 mb-8"
+        style={{
+          backgroundColor: "oklch(0.72 0.11 74 / 0.08)",
+          borderColor: "oklch(0.72 0.11 74 / 0.35)",
+        }}
+        data-ocid="zoom.notice.card"
+      >
+        <AlertCircle
+          className="w-5 h-5 shrink-0 mt-0.5"
+          style={{ color: "oklch(0.72 0.11 74)" }}
+        />
+        <p
+          className="text-sm font-sans leading-relaxed"
+          style={{ color: "oklch(0.85 0.06 74)" }}
+        >
+          <span className="font-semibold text-gold">To join meetings:</span> Pay{" "}
+          <span className="font-semibold">₹500/year</span> via UPI to{" "}
+          <span className="font-mono font-semibold text-gold">
+            9582376290@ptaxis
+          </span>
+          , then send <span className="font-semibold">your name</span> (as it
+          will appear in Zoom) and a{" "}
+          <span className="font-semibold">screenshot of payment</span> on
+          WhatsApp to{" "}
+          <span className="font-semibold text-gold">9220561379</span>.
+        </p>
+      </motion.div>
+
       {isLoading && (
         <div
           className="text-center py-12 text-muted-foreground font-sans"
@@ -274,46 +659,87 @@ export default function ZoomMeetings() {
         </div>
       </section>
 
-      {/* Auth gate */}
-      {!isAuthenticated ? (
-        <section className="px-4 sm:px-6 max-w-xl mx-auto mt-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="rounded-2xl border text-center p-12"
+      {/* Tabs */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 mt-10">
+        <Tabs defaultValue="meetings" data-ocid="zoom.tab">
+          <TabsList
+            className="w-full max-w-xs mx-auto flex rounded-full p-1 mb-2"
             style={{
-              backgroundColor: "oklch(0.19 0.028 243)",
-              borderColor: "oklch(0.28 0.028 243)",
+              backgroundColor: "oklch(0.22 0.008 240)",
+              border: "1px solid oklch(0.28 0.028 243)",
             }}
-            data-ocid="zoom.auth_gate.card"
           >
-            <div
-              className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
-              style={{ backgroundColor: "oklch(0.72 0.11 74 / 0.15)" }}
+            <TabsTrigger
+              value="meetings"
+              className="flex-1 rounded-full text-sm font-sans font-semibold transition-all data-[state=active]:shadow-sm"
+              style={{
+                color: "oklch(0.65 0.02 243)",
+              }}
+              data-ocid="zoom.meetings.tab"
             >
-              <Lock className="w-8 h-8 text-gold" />
-            </div>
-            <h3 className="font-serif text-2xl font-bold text-foreground mb-3">
-              Sign In to View Meeting Links
-            </h3>
-            <p className="text-muted-foreground font-sans max-w-sm mx-auto mb-6">
-              Meeting links are shared exclusively with registered members of
-              Advay Tyagi Academy.
-            </p>
-            <Button
-              onClick={() => setAuthModal(true)}
-              size="lg"
-              className="bg-gold text-primary-foreground hover:bg-gold-light font-sans font-semibold rounded-full px-8"
-              data-ocid="zoom.login.button"
+              <Video className="w-3.5 h-3.5 mr-1.5" />
+              Meetings
+            </TabsTrigger>
+            <TabsTrigger
+              value="faqs"
+              className="flex-1 rounded-full text-sm font-sans font-semibold transition-all data-[state=active]:shadow-sm"
+              style={{
+                color: "oklch(0.65 0.02 243)",
+              }}
+              data-ocid="zoom.faqs.tab"
             >
-              Sign In to Access
-            </Button>
-          </motion.div>
-        </section>
-      ) : (
-        <MeetingsView />
-      )}
+              <HelpCircle className="w-3.5 h-3.5 mr-1.5" />
+              FAQs
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="meetings">
+            {!isAuthenticated ? (
+              <section className="px-4 sm:px-6 max-w-xl mx-auto mt-10">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="rounded-2xl border text-center p-12"
+                  style={{
+                    backgroundColor: "oklch(0.19 0.028 243)",
+                    borderColor: "oklch(0.28 0.028 243)",
+                  }}
+                  data-ocid="zoom.auth_gate.card"
+                >
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
+                    style={{ backgroundColor: "oklch(0.72 0.11 74 / 0.15)" }}
+                  >
+                    <Lock className="w-8 h-8 text-gold" />
+                  </div>
+                  <h3 className="font-serif text-2xl font-bold text-foreground mb-3">
+                    Sign In to View Meeting Links
+                  </h3>
+                  <p className="text-muted-foreground font-sans max-w-sm mx-auto mb-6">
+                    Meeting links are shared exclusively with registered members
+                    of Advay Tyagi Academy.
+                  </p>
+                  <Button
+                    onClick={() => setAuthModal(true)}
+                    size="lg"
+                    className="bg-gold text-primary-foreground hover:bg-gold-light font-sans font-semibold rounded-full px-8"
+                    data-ocid="zoom.login.button"
+                  >
+                    Sign In to Access
+                  </Button>
+                </motion.div>
+              </section>
+            ) : (
+              <MeetingsView />
+            )}
+          </TabsContent>
+
+          <TabsContent value="faqs">
+            <FAQsView />
+          </TabsContent>
+        </Tabs>
+      </div>
     </main>
   );
 }
