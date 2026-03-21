@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
+import Admin from "./pages/Admin";
 import Ebooks from "./pages/Ebooks";
 import Geopolitics from "./pages/Geopolitics";
 import Home from "./pages/Home";
@@ -65,6 +66,11 @@ const zoomMeetingsRoute = createRoute({
   path: "/zoom-meetings",
   component: ZoomMeetings,
 });
+const adminRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin",
+  component: Admin,
+});
 
 const routeTree = rootRoute.addChildren([
   homeRoute,
@@ -72,6 +78,7 @@ const routeTree = rootRoute.addChildren([
   geopoliticsRoute,
   ebooksRoute,
   zoomMeetingsRoute,
+  adminRoute,
 ]);
 
 const router = createRouter({ routeTree });

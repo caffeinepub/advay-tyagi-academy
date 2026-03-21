@@ -1,4 +1,5 @@
 import Map "mo:core/Map";
+import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 
 module {
@@ -13,9 +14,6 @@ module {
     userRoles : Map.Map<Principal, UserRole>;
   };
 
-  // Hardcoded admin principal
-  let HARDCODED_ADMIN : Text = "hzsfz-kiu7s-v7ls7-t7khq-ydmaz-ycmoh-tbz6k-vydx4-7nmxd-6qcse-jae";
-
   public func initState() : AccessControlState {
     {
       var adminAssigned = false;
@@ -29,10 +27,7 @@ module {
     switch (state.userRoles.get(caller)) {
       case (?_) {};
       case (null) {
-        if (caller.toText() == HARDCODED_ADMIN) {
-          state.userRoles.add(caller, #admin);
-          state.adminAssigned := true;
-        } else if (not state.adminAssigned and userProvidedToken == adminToken) {
+        if (not state.adminAssigned and userProvidedToken == adminToken) {
           state.userRoles.add(caller, #admin);
           state.adminAssigned := true;
         } else {
@@ -44,13 +39,9 @@ module {
 
   public func getUserRole(state : AccessControlState, caller : Principal) : UserRole {
     if (caller.isAnonymous()) { return #guest };
-    // Hardcoded admin always gets admin role
-    if (caller.toText() == HARDCODED_ADMIN) { return #admin };
     switch (state.userRoles.get(caller)) {
       case (?role) { role };
-      case (null) {
-        Runtime.trap("User is not registered");
-      };
+      case (null) { #guest }; // unregistered users are guests, not an error
     };
   };
 
@@ -69,8 +60,6 @@ module {
   };
 
   public func isAdmin(state : AccessControlState, caller : Principal) : Bool {
-    // Hardcoded admin always has admin access
-    if (caller.toText() == HARDCODED_ADMIN) { return true };
     getUserRole(state, caller) == #admin;
   };
 };

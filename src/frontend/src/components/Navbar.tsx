@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
   CheckCheck,
@@ -7,13 +7,19 @@ import {
   GraduationCap,
   LogOut,
   Menu,
+  Shield,
   User,
   X,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useActor } from "../hooks/useActor";
 import { useInternetIdentity } from "../hooks/useInternetIdentity";
 import AuthModal from "./AuthModal";
+
+// Hardcoded admin principal — always shows Admin link for this account
+const ADMIN_PRINCIPAL =
+  "hzsfz-kiu7s-v7ls7-t7khq-ydmaz-ycmoh-tbz6k-vydx4-7nmxd-6qcse-jae";
 
 const navLinks = [
   { label: "Home", to: "/" },
@@ -25,6 +31,7 @@ const navLinks = [
 
 export default function Navbar() {
   const { identity, clear, loginStatus } = useInternetIdentity();
+  const { actor, isFetching } = useActor();
   const queryClient = useQueryClient();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -36,6 +43,27 @@ export default function Navbar() {
   const principalShort = fullPrincipal
     ? `${fullPrincipal.slice(0, 10)}...`
     : null;
+
+  // Frontend-side admin check — instant, never fails
+  const isAdminByPrincipal = fullPrincipal === ADMIN_PRINCIPAL;
+
+  // Backend check as secondary confirmation; errors gracefully fall back to false
+  const { data: isAdminFromBackend } = useQuery({
+    queryKey: ["isAdmin"],
+    queryFn: async () => {
+      if (!actor) return false;
+      try {
+        return await actor.isCallerAdmin();
+      } catch {
+        return false;
+      }
+    },
+    enabled: !!actor && !isFetching && isAuthenticated,
+    initialData: false,
+  });
+
+  // Show Admin link if either frontend or backend check passes
+  const isAdmin = isAdminByPrincipal || !!isAdminFromBackend;
 
   const handleLogout = async () => {
     await clear();
@@ -94,6 +122,20 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+            {isAuthenticated && isAdmin && (
+              <Link
+                to="/admin"
+                className={`font-sans text-sm transition-colors flex items-center gap-1 ${
+                  location.pathname === "/admin"
+                    ? "text-gold"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                data-ocid="nav.admin.link"
+              >
+                <Shield className="w-3.5 h-3.5" />
+                Admin
+              </Link>
+            )}
           </nav>
 
           {/* Auth Buttons */}
@@ -189,6 +231,17 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+            {isAuthenticated && isAdmin && (
+              <Link
+                to="/admin"
+                onClick={() => setMobileOpen(false)}
+                className="font-sans text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
+                data-ocid="nav.admin.link"
+              >
+                <Shield className="w-3.5 h-3.5" />
+                Admin
+              </Link>
+            )}
             {isAuthenticated ? (
               <div className="flex flex-col gap-2">
                 {fullPrincipal && (

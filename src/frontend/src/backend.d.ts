@@ -57,13 +57,17 @@ export interface backendInterface {
     getAllGeopoliticsLessons(): Promise<Array<Type__2>>;
     getAllMasterclasses(): Promise<Array<Type__1>>;
     getAllZoomMeetings(): Promise<Array<Type>>;
+    getAllPremiumUsers(): Promise<Array<Principal>>;
     getCallerUserRole(): Promise<UserRole>;
     getEbook(id: bigint): Promise<Type__3>;
     getGeopoliticsLesson(id: bigint): Promise<Type__2>;
     getMasterclass(id: bigint): Promise<Type__1>;
     getUserEnrollments(user: Principal): Promise<Array<bigint>>;
     getZoomMeeting(id: bigint): Promise<Type>;
+    grantPremium(user: Principal): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
+    isCallerPremium(): Promise<boolean>;
+    revokePremium(user: Principal): Promise<void>;
     updateEbook(id: bigint, title: string, description: string, author: string, pdfUrl: string): Promise<void>;
     updateGeopoliticsLesson(id: bigint, title: string, content: string, date: Time, dayNumber: bigint): Promise<void>;
     updateMasterclass(id: bigint, title: string, description: string, instructor: string, duration: bigint): Promise<void>;

@@ -73,14 +73,49 @@ actor {
   let ebooks = Map.empty<Nat, Ebook.Type>();
   let zoomMeetings = Map.empty<Nat, ZoomMeeting.Type>();
   let userEnrollments = Map.empty<Principal, List.List<Nat>>();
+  let premiumUsers = Map.empty<Principal, Bool>();
   var nextMasterclassId = 1;
   var nextGeopoliticsLessonId = 1;
   var nextEbookId = 1;
   var nextZoomMeetingId = 1;
 
-  // Initialize the access control state
+  // Initialize the access control state and hardcode the admin principal
   let accessControlState = AccessControl.initState();
+  let hardcodedAdmin = Principal.fromText("hzsfz-kiu7s-v7ls7-t7khq-ydmaz-ycmoh-tbz6k-vydx4-7nmxd-6qcse-jae");
+  accessControlState.userRoles.add(hardcodedAdmin, #admin);
+  accessControlState.adminAssigned := true;
   include MixinAuthorization(accessControlState);
+
+  // Premium user management
+  public shared ({ caller }) func grantPremium(user : Principal) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can grant premium access");
+    };
+    premiumUsers.add(user, true);
+  };
+
+  public shared ({ caller }) func revokePremium(user : Principal) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can revoke premium access");
+    };
+    premiumUsers.remove(user);
+  };
+
+  public query ({ caller }) func isCallerPremium() : async Bool {
+    if (caller.isAnonymous()) { return false };
+    if (AccessControl.isAdmin(accessControlState, caller)) { return true };
+    switch (premiumUsers.get(caller)) {
+      case (?true) { true };
+      case (_) { false };
+    };
+  };
+
+  public query ({ caller }) func getAllPremiumUsers() : async [Principal] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view premium users");
+    };
+    premiumUsers.keys().toArray();
+  };
 
   // Masterclass functions
   public shared ({ caller }) func createMasterclass(title : Text, description : Text, instructor : Text, duration : Nat) : async Nat {
@@ -102,7 +137,6 @@ actor {
   };
 
   public query ({ caller }) func getMasterclass(id : Nat) : async Masterclass.Type {
-    // Read access for all (including guests)
     switch (masterclasses.get(id)) {
       case (null) { Runtime.trap("Masterclass not found") };
       case (?masterclass) { masterclass };
@@ -110,7 +144,6 @@ actor {
   };
 
   public query ({ caller }) func getAllMasterclasses() : async [Masterclass.Type] {
-    // Read access for all (including guests)
     masterclasses.values().toArray().sort();
   };
 
@@ -167,10 +200,6 @@ actor {
   };
 
   public query ({ caller }) func getGeopoliticsLesson(id : Nat) : async GeopoliticsLesson.Type {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can read lessons");
-    };
-
     switch (geopoliticsLessons.get(id)) {
       case (null) { Runtime.trap("Lesson not found") };
       case (?lesson) { lesson };
@@ -178,10 +207,6 @@ actor {
   };
 
   public query ({ caller }) func getAllGeopoliticsLessons() : async [GeopoliticsLesson.Type] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can read lessons");
-    };
-
     geopoliticsLessons.values().toArray().sort();
   };
 
@@ -237,10 +262,6 @@ actor {
   };
 
   public query ({ caller }) func getEbook(id : Nat) : async Ebook.Type {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can access ebooks");
-    };
-
     switch (ebooks.get(id)) {
       case (null) { Runtime.trap("Ebook not found") };
       case (?ebook) { ebook };
@@ -248,10 +269,6 @@ actor {
   };
 
   public query ({ caller }) func getAllEbooks() : async [Ebook.Type] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can access ebooks");
-    };
-
     ebooks.values().toArray().sort();
   };
 
@@ -307,10 +324,6 @@ actor {
   };
 
   public query ({ caller }) func getZoomMeeting(id : Nat) : async ZoomMeeting.Type {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can read zoom meetings");
-    };
-
     switch (zoomMeetings.get(id)) {
       case (null) { Runtime.trap("ZoomMeeting not found") };
       case (?zoomMeeting) { zoomMeeting };
@@ -318,10 +331,6 @@ actor {
   };
 
   public query ({ caller }) func getAllZoomMeetings() : async [ZoomMeeting.Type] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can read zoom meetings");
-    };
-
     zoomMeetings.values().toArray().sort();
   };
 
@@ -360,8 +369,8 @@ actor {
 
   // Enrollment functions
   public shared ({ caller }) func enrollInMasterclass(masterclassId : Nat) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can enroll");
+    if (caller.isAnonymous()) {
+      Runtime.trap("Unauthorized: Must be logged in to enroll");
     };
 
     switch (masterclasses.get(masterclassId)) {
