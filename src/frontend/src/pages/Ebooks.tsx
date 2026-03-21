@@ -261,39 +261,31 @@ function WarsPdfViewer() {
           borderColor: "oklch(0.28 0.028 243)",
         }}
       >
-        <div className="flex items-start gap-4">
-          <div
-            className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-            style={{ backgroundColor: "oklch(0.38 0.11 40)" }}
-          >
-            <BookOpen className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h3 className="font-serif text-lg font-bold text-foreground">
-              Chapter 1 — Wars & Terrorist Attacks Handled by India
-            </h3>
-            <p className="text-xs font-sans text-gold mt-0.5">
-              Advay Tyagi Academy · Handwritten · Verified Knowledge
-            </p>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {[
-                "Handwritten notes",
-                "100% accurate",
-                "Premium exclusive",
-                "No downloads",
-              ].map((tag) => (
-                <span
-                  key={tag}
-                  className="text-xs px-2 py-0.5 rounded-full font-sans"
-                  style={{
-                    backgroundColor: "oklch(0.72 0.11 74 / 0.12)",
-                    color: "oklch(0.72 0.11 74)",
-                  }}
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
+        <div>
+          <h3 className="font-serif text-lg font-bold text-foreground">
+            Chapter 1 — Wars & Terrorist Attacks Handled by India
+          </h3>
+          <p className="text-xs font-sans text-gold mt-0.5">
+            Advay Tyagi Academy · Handwritten · Verified Knowledge
+          </p>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {[
+              "Handwritten notes",
+              "100% accurate",
+              "Premium exclusive",
+              "No downloads",
+            ].map((tag) => (
+              <span
+                key={tag}
+                className="text-xs px-2 py-0.5 rounded-full font-sans"
+                style={{
+                  backgroundColor: "oklch(0.72 0.11 74 / 0.12)",
+                  color: "oklch(0.72 0.11 74)",
+                }}
+              >
+                {tag}
+              </span>
+            ))}
           </div>
         </div>
       </div>
@@ -305,6 +297,81 @@ function WarsPdfViewer() {
         <iframe
           src="/assets/uploads/CHAPTER-1-WARS-1-1.pdf#toolbar=0&navpanes=0&scrollbar=1"
           title="Chapter 1 – Wars and Terrorist Attacks Handled by India"
+          className="w-full"
+          style={{ height: "80vh", minHeight: 500 }}
+        />
+      </div>
+    </motion.div>
+  );
+}
+
+function MiddleEastPdfViewer() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col gap-4"
+    >
+      <div
+        className="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-sans"
+        style={{
+          backgroundColor: "oklch(0.72 0.11 74 / 0.08)",
+          borderColor: "oklch(0.72 0.11 74 / 0.25)",
+          color: "oklch(0.72 0.11 74)",
+        }}
+      >
+        <ShieldCheck className="w-4 h-4 shrink-0" />
+        <span>
+          <strong>No downloading permitted.</strong> This content is for online
+          reading only. Sharing or distributing this material is strictly
+          prohibited.
+        </span>
+      </div>
+
+      <div
+        className="px-6 py-4 rounded-xl border"
+        style={{
+          backgroundColor: "oklch(0.19 0.028 243)",
+          borderColor: "oklch(0.28 0.028 243)",
+        }}
+      >
+        <div>
+          <h3 className="font-serif text-lg font-bold text-foreground">
+            Chapter 1 — Middle East: The Famous Conflict
+          </h3>
+          <p className="text-xs font-sans text-gold mt-0.5">
+            Advay Tyagi Academy · Handwritten · Verified Knowledge
+          </p>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {[
+              "Handwritten notes",
+              "100% accurate",
+              "Premium exclusive",
+              "No downloads",
+            ].map((tag) => (
+              <span
+                key={tag}
+                className="text-xs px-2 py-0.5 rounded-full font-sans"
+                style={{
+                  backgroundColor: "oklch(0.72 0.11 74 / 0.12)",
+                  color: "oklch(0.72 0.11 74)",
+                }}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="rounded-xl border overflow-hidden"
+        style={{ borderColor: "oklch(0.28 0.028 243)" }}
+      >
+        <iframe
+          src="/assets/uploads/CHAPTER-1-MIDDLE-EAST-_compressed-2--1.pdf#toolbar=0&navpanes=0&scrollbar=1"
+          title="Chapter 1 – Middle East: The Famous Conflict"
           className="w-full"
           style={{ height: "80vh", minHeight: 500 }}
         />
@@ -361,6 +428,26 @@ export default function Ebooks() {
       return <PremiumLockedGate />;
     }
     return <WarsPdfViewer />;
+  }
+
+  function MiddleEastContent() {
+    if (!isAuthenticated) {
+      return <PremiumGate onLogin={() => setAuthModal("login")} />;
+    }
+    if (premiumLoading) {
+      return (
+        <div
+          className="flex items-center justify-center py-24"
+          data-ocid="ebooks.middleeast.loading_state"
+        >
+          <Loader2 className="w-6 h-6 animate-spin text-gold" />
+        </div>
+      );
+    }
+    if (!isPremium && !isAdminLocal) {
+      return <PremiumLockedGate />;
+    }
+    return <MiddleEastPdfViewer />;
   }
 
   return (
@@ -445,7 +532,7 @@ export default function Ebooks() {
             </TabsContent>
 
             <TabsContent value="middleeast">
-              <ComingSoonPlaceholder label="Middle East – The Famous Conflict" />
+              <MiddleEastContent />
             </TabsContent>
           </Tabs>
         </motion.div>

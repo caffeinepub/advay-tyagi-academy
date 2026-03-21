@@ -7,69 +7,62 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
-export interface Type__3 {
+export interface MasterclassType {
+    id: bigint;
+    title: string;
+    description: string;
+    instructor: string;
+    duration: bigint;
+    price: bigint;
+}
+export interface GeopoliticsLessonType {
+    id: bigint;
+    title: string;
+    content: string;
+    date: bigint;
+    dayNumber: bigint;
+}
+export interface EbookType {
     id: bigint;
     title: string;
     description: string;
     author: string;
     pdfUrl: string;
 }
-export interface Type__1 {
+export interface ZoomMeetingType {
     id: bigint;
     title: string;
-    duration: bigint;
-    instructor: string;
-    description: string;
-    price: bigint;
-}
-export interface Type {
-    id: bigint;
-    title: string;
-    scheduledDate: Time;
     description: string;
     zoomLink: string;
+    scheduledDate: bigint;
 }
 export type Time = bigint;
-export interface Type__2 {
-    id: bigint;
-    title: string;
-    content: string;
-    date: Time;
-    dayNumber: bigint;
-}
-export enum UserRole {
-    admin = "admin",
-    user = "user",
-    guest = "guest"
-}
 export interface backendInterface {
-    assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    createEbook(title: string, description: string, author: string, pdfUrl: string): Promise<bigint>;
-    createGeopoliticsLesson(title: string, content: string, date: Time, dayNumber: bigint): Promise<bigint>;
-    createMasterclass(title: string, description: string, instructor: string, duration: bigint): Promise<bigint>;
-    createZoomMeeting(title: string, description: string, zoomLink: string, scheduledDate: Time): Promise<bigint>;
-    deleteEbook(id: bigint): Promise<void>;
-    deleteGeopoliticsLesson(id: bigint): Promise<void>;
-    deleteMasterclass(id: bigint): Promise<void>;
-    deleteZoomMeeting(id: bigint): Promise<void>;
-    enrollInMasterclass(masterclassId: bigint): Promise<void>;
-    getAllEbooks(): Promise<Array<Type__3>>;
-    getAllGeopoliticsLessons(): Promise<Array<Type__2>>;
-    getAllMasterclasses(): Promise<Array<Type__1>>;
-    getAllZoomMeetings(): Promise<Array<Type>>;
-    getAllPremiumUsers(): Promise<Array<Principal>>;
-    getCallerUserRole(): Promise<UserRole>;
-    getEbook(id: bigint): Promise<Type__3>;
-    getGeopoliticsLesson(id: bigint): Promise<Type__2>;
-    getMasterclass(id: bigint): Promise<Type__1>;
-    getUserEnrollments(user: Principal): Promise<Array<bigint>>;
-    getZoomMeeting(id: bigint): Promise<Type>;
-    grantPremium(user: Principal): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
     isCallerPremium(): Promise<boolean>;
+    grantPremium(user: Principal): Promise<void>;
     revokePremium(user: Principal): Promise<void>;
-    updateEbook(id: bigint, title: string, description: string, author: string, pdfUrl: string): Promise<void>;
-    updateGeopoliticsLesson(id: bigint, title: string, content: string, date: Time, dayNumber: bigint): Promise<void>;
+    getAllPremiumUsers(): Promise<Array<Principal>>;
+    createMasterclass(title: string, description: string, instructor: string, duration: bigint): Promise<bigint>;
+    getMasterclass(id: bigint): Promise<MasterclassType>;
+    getAllMasterclasses(): Promise<Array<MasterclassType>>;
     updateMasterclass(id: bigint, title: string, description: string, instructor: string, duration: bigint): Promise<void>;
+    deleteMasterclass(id: bigint): Promise<void>;
+    createGeopoliticsLesson(title: string, content: string, date: Time, dayNumber: bigint): Promise<bigint>;
+    getGeopoliticsLesson(id: bigint): Promise<GeopoliticsLessonType>;
+    getAllGeopoliticsLessons(): Promise<Array<GeopoliticsLessonType>>;
+    updateGeopoliticsLesson(id: bigint, title: string, content: string, date: Time, dayNumber: bigint): Promise<void>;
+    deleteGeopoliticsLesson(id: bigint): Promise<void>;
+    createEbook(title: string, description: string, author: string, pdfUrl: string): Promise<bigint>;
+    getEbook(id: bigint): Promise<EbookType>;
+    getAllEbooks(): Promise<Array<EbookType>>;
+    updateEbook(id: bigint, title: string, description: string, author: string, pdfUrl: string): Promise<void>;
+    deleteEbook(id: bigint): Promise<void>;
+    createZoomMeeting(title: string, description: string, zoomLink: string, scheduledDate: Time): Promise<bigint>;
+    getZoomMeeting(id: bigint): Promise<ZoomMeetingType>;
+    getAllZoomMeetings(): Promise<Array<ZoomMeetingType>>;
     updateZoomMeeting(id: bigint, title: string, description: string, zoomLink: string, scheduledDate: Time): Promise<void>;
+    deleteZoomMeeting(id: bigint): Promise<void>;
+    enrollInMasterclass(masterclassId: bigint): Promise<void>;
+    getUserEnrollments(user: Principal): Promise<Array<bigint>>;
 }

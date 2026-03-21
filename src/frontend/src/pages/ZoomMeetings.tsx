@@ -63,11 +63,9 @@ function getPlaceholderMeetings(): ZoomMeeting[] {
     {
       id: BigInt(0),
       title: "Monthly Live Session \u2014 March 2026",
-      description:
-        "Join Advay Tyagi for a live Q&A, current affairs deep-dive, and strategic discussion.",
+      description: "This session has ended.",
       scheduledDate: BigInt(march.getTime()) * 1_000_000n,
-      zoomLink:
-        "https://us05web.zoom.us/j/86999900653?pwd=N5RuGRLn1pbBPbFzbQh4adxWJcFBxb.1",
+      zoomLink: "",
       meetingId: "869 9990 0653",
       passcode: "8X5m6i",
     },
@@ -75,9 +73,12 @@ function getPlaceholderMeetings(): ZoomMeeting[] {
       id: BigInt(1),
       title: "Monthly Live Session \u2014 April 2026",
       description:
-        "Join Advay Tyagi for a live Q&A, current affairs deep-dive, and strategic discussion. Link will be shared closer to the session date.",
+        "Join Advay Tyagi for a live Q&A, current affairs deep-dive, and strategic discussion.",
       scheduledDate: BigInt(april.getTime()) * 1_000_000n,
-      zoomLink: "",
+      zoomLink:
+        "https://us05web.zoom.us/j/89666915566?pwd=vppxZiDYsBF0LW9b44CPbME9ohIKL4.1",
+      meetingId: "896 6691 5566",
+      passcode: "DAj6T8",
     },
     {
       id: BigInt(2),
