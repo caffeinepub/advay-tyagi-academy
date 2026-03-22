@@ -2,7 +2,6 @@ import Map "mo:core/Map";
 import List "mo:core/List";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
-import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 import Order "mo:core/Order";
 import Time "mo:core/Time";
@@ -73,15 +72,19 @@ actor {
   var nextEbookId = 1;
   var nextZoomMeetingId = 1;
 
+  // Keep accessControlState for stable variable compatibility with previous versions
   let accessControlState = AccessControl.initState();
+
+  // Hardcoded admin -- direct principal comparison, no role map needed
   let hardcodedAdmin = Principal.fromText("hzsfz-kiu7s-v7ls7-t7khq-ydmaz-ycmoh-tbz6k-vydx4-7nmxd-6qcse-jae");
-  accessControlState.userRoles.add(hardcodedAdmin, #admin);
-  accessControlState.adminAssigned := true;
-  include MixinAuthorization(accessControlState);
-  // MixinAuthorization provides isCallerAdmin() already
 
   func isAdmin(caller : Principal) : Bool {
-    AccessControl.hasPermission(accessControlState, caller, #admin);
+    caller == hardcodedAdmin
+  };
+
+  // Direct principal comparison -- no role map, no traps, always reliable
+  public query ({ caller }) func isCallerAdmin() : async Bool {
+    caller == hardcodedAdmin
   };
 
   // Premium access management

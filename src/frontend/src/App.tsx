@@ -14,6 +14,7 @@ import Ebooks from "./pages/Ebooks";
 import Geopolitics from "./pages/Geopolitics";
 import Home from "./pages/Home";
 import Masterclasses from "./pages/Masterclasses";
+import Payment from "./pages/Payment";
 import ZoomMeetings from "./pages/ZoomMeetings";
 
 const queryClient = new QueryClient({
@@ -71,6 +72,11 @@ const adminRoute = createRoute({
   path: "/admin",
   component: Admin,
 });
+const paymentRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/payment",
+  component: Payment,
+});
 
 const routeTree = rootRoute.addChildren([
   homeRoute,
@@ -79,6 +85,7 @@ const routeTree = rootRoute.addChildren([
   ebooksRoute,
   zoomMeetingsRoute,
   adminRoute,
+  paymentRoute,
 ]);
 
 const router = createRouter({ routeTree });

@@ -27,6 +27,7 @@ const navLinks = [
   { label: "Geopolitics", to: "/geopolitics" },
   { label: "E-Books", to: "/ebooks" },
   { label: "Zoom Meetings", to: "/zoom-meetings" },
+  { label: "Payment", to: "/payment" },
 ];
 
 export default function Navbar() {
@@ -107,7 +108,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-5">
             {navLinks.map((link) => (
               <Link
                 key={link.to}

@@ -139,6 +139,7 @@ export interface backendInterface {
     getAllEbooks(): Promise<Array<Type__3>>;
     getAllGeopoliticsLessons(): Promise<Array<Type__2>>;
     getAllMasterclasses(): Promise<Array<Type__1>>;
+    getAllPremiumUsers(): Promise<Array<Principal>>;
     getAllZoomMeetings(): Promise<Array<Type>>;
     getCallerUserRole(): Promise<UserRole>;
     getEbook(id: bigint): Promise<Type__3>;
@@ -146,7 +147,10 @@ export interface backendInterface {
     getMasterclass(id: bigint): Promise<Type__1>;
     getUserEnrollments(user: Principal): Promise<Array<bigint>>;
     getZoomMeeting(id: bigint): Promise<Type>;
+    grantPremium(user: Principal): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
+    isCallerPremium(): Promise<boolean>;
+    revokePremium(user: Principal): Promise<void>;
     updateEbook(id: bigint, title: string, description: string, author: string, pdfUrl: string): Promise<void>;
     updateGeopoliticsLesson(id: bigint, title: string, content: string, date: Time, dayNumber: bigint): Promise<void>;
     updateMasterclass(id: bigint, title: string, description: string, instructor: string, duration: bigint): Promise<void>;
@@ -351,6 +355,18 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getAllPremiumUsers(): Promise<Array<Principal>> {
+        if (this.processError) {
+            try {
+                return await this.actor.getAllPremiumUsers();
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            return await this.actor.getAllPremiumUsers();
+        }
+    }
     async getAllZoomMeetings(): Promise<Array<Type>> {
         if (this.processError) {
             try {
@@ -449,6 +465,18 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async grantPremium(arg0: Principal): Promise<void> {
+        if (this.processError) {
+            try {
+                return await this.actor.grantPremium(arg0);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            return await this.actor.grantPremium(arg0);
+        }
+    }
     async isCallerAdmin(): Promise<boolean> {
         if (this.processError) {
             try {
@@ -461,6 +489,30 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.isCallerAdmin();
             return result;
+        }
+    }
+    async isCallerPremium(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                return await this.actor.isCallerPremium();
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            return await this.actor.isCallerPremium();
+        }
+    }
+    async revokePremium(arg0: Principal): Promise<void> {
+        if (this.processError) {
+            try {
+                return await this.actor.revokePremium(arg0);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            return await this.actor.revokePremium(arg0);
         }
     }
     async updateEbook(arg0: bigint, arg1: string, arg2: string, arg3: string, arg4: string): Promise<void> {

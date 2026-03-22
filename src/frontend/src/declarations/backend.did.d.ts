@@ -61,6 +61,7 @@ export interface _SERVICE {
   'getAllEbooks' : ActorMethod<[], Array<Type__3>>,
   'getAllGeopoliticsLessons' : ActorMethod<[], Array<Type__2>>,
   'getAllMasterclasses' : ActorMethod<[], Array<Type__1>>,
+  'getAllPremiumUsers' : ActorMethod<[], Array<Principal>>,
   'getAllZoomMeetings' : ActorMethod<[], Array<Type>>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getEbook' : ActorMethod<[bigint], Type__3>,
@@ -68,7 +69,10 @@ export interface _SERVICE {
   'getMasterclass' : ActorMethod<[bigint], Type__1>,
   'getUserEnrollments' : ActorMethod<[Principal], Array<bigint>>,
   'getZoomMeeting' : ActorMethod<[bigint], Type>,
+  'grantPremium' : ActorMethod<[Principal], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'isCallerPremium' : ActorMethod<[], boolean>,
+  'revokePremium' : ActorMethod<[Principal], undefined>,
   'updateEbook' : ActorMethod<
     [bigint, string, string, string, string],
     undefined
