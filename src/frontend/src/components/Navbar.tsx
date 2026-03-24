@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
   CheckCheck,
@@ -13,26 +13,25 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useActor } from "../hooks/useActor";
 import { useInternetIdentity } from "../hooks/useInternetIdentity";
 import AuthModal from "./AuthModal";
 
-// Hardcoded admin principal — always shows Admin link for this account
 const ADMIN_PRINCIPAL =
   "hzsfz-kiu7s-v7ls7-t7khq-ydmaz-ycmoh-tbz6k-vydx4-7nmxd-6qcse-jae";
 
 const navLinks = [
   { label: "Home", to: "/" },
   { label: "Masterclasses", to: "/masterclasses" },
+  { label: "Courses", to: "/courses" },
   { label: "Geopolitics", to: "/geopolitics" },
   { label: "E-Books", to: "/ebooks" },
   { label: "Zoom Meetings", to: "/zoom-meetings" },
   { label: "Payment", to: "/payment" },
+  { label: "FAQs", to: "/faqs" },
 ];
 
 export default function Navbar() {
   const { identity, clear, loginStatus } = useInternetIdentity();
-  const { actor, isFetching } = useActor();
   const queryClient = useQueryClient();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -45,26 +44,7 @@ export default function Navbar() {
     ? `${fullPrincipal.slice(0, 10)}...`
     : null;
 
-  // Frontend-side admin check — instant, never fails
-  const isAdminByPrincipal = fullPrincipal === ADMIN_PRINCIPAL;
-
-  // Backend check as secondary confirmation; errors gracefully fall back to false
-  const { data: isAdminFromBackend } = useQuery({
-    queryKey: ["isAdmin"],
-    queryFn: async () => {
-      if (!actor) return false;
-      try {
-        return await actor.isCallerAdmin();
-      } catch {
-        return false;
-      }
-    },
-    enabled: !!actor && !isFetching && isAuthenticated,
-    initialData: false,
-  });
-
-  // Show Admin link if either frontend or backend check passes
-  const isAdmin = isAdminByPrincipal || !!isAdminFromBackend;
+  const isAdmin = fullPrincipal === ADMIN_PRINCIPAL;
 
   const handleLogout = async () => {
     await clear();
@@ -108,12 +88,12 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-5">
+          <nav className="hidden lg:flex items-center gap-4">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
-                className={`font-sans text-sm transition-colors ${
+                className={`font-sans text-xs transition-colors ${
                   location.pathname === link.to
                     ? "text-gold"
                     : "text-muted-foreground hover:text-foreground"
@@ -126,26 +106,26 @@ export default function Navbar() {
             {isAuthenticated && isAdmin && (
               <Link
                 to="/admin"
-                className={`font-sans text-sm transition-colors flex items-center gap-1 ${
+                className={`font-sans text-xs transition-colors flex items-center gap-1 ${
                   location.pathname === "/admin"
                     ? "text-gold"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
                 data-ocid="nav.admin.link"
               >
-                <Shield className="w-3.5 h-3.5" />
+                <Shield className="w-3 h-3" />
                 Admin
               </Link>
             )}
           </nav>
 
           {/* Auth Buttons */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2">
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                   <User className="w-4 h-4" />
-                  <span className="font-sans">{principalShort}</span>
+                  <span className="font-sans text-xs">{principalShort}</span>
                 </div>
                 <button
                   type="button"
@@ -168,10 +148,10 @@ export default function Navbar() {
                   size="sm"
                   onClick={handleLogout}
                   disabled={loginStatus === "logging-in"}
-                  className="border-border text-foreground hover:bg-card font-sans"
+                  className="border-border text-foreground hover:bg-card font-sans text-xs"
                   data-ocid="nav.logout.button"
                 >
-                  <LogOut className="w-4 h-4 mr-1" /> Logout
+                  <LogOut className="w-3.5 h-3.5 mr-1" /> Logout
                 </Button>
               </div>
             ) : (
@@ -180,7 +160,7 @@ export default function Navbar() {
                   variant="outline"
                   size="sm"
                   onClick={() => setAuthModal("login")}
-                  className="border-border text-foreground hover:bg-card font-sans rounded-full px-5"
+                  className="border-border text-foreground hover:bg-card font-sans rounded-full px-4 text-xs"
                   data-ocid="nav.login.button"
                 >
                   Log In
@@ -188,7 +168,7 @@ export default function Navbar() {
                 <Button
                   size="sm"
                   onClick={() => setAuthModal("signup")}
-                  className="bg-gold text-primary-foreground hover:bg-gold-light font-sans rounded-full px-5 font-semibold"
+                  className="bg-gold text-primary-foreground hover:bg-gold-light font-sans rounded-full px-4 font-semibold text-xs"
                   data-ocid="nav.signup.button"
                 >
                   Get Started
@@ -200,7 +180,7 @@ export default function Navbar() {
           {/* Mobile toggle */}
           <button
             type="button"
-            className="md:hidden text-foreground p-2"
+            className="lg:hidden text-foreground p-2"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
@@ -215,7 +195,7 @@ export default function Navbar() {
         {/* Mobile menu */}
         {mobileOpen && (
           <div
-            className="md:hidden border-t px-4 py-4 flex flex-col gap-4"
+            className="lg:hidden border-t px-4 py-4 flex flex-col gap-3"
             style={{
               backgroundColor: "oklch(0.12 0.028 243)",
               borderColor: "oklch(0.22 0.028 243)",

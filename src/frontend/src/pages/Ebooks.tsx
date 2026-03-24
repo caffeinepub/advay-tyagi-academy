@@ -1,14 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
-import {
-  BookOpen,
-  Crown,
-  Loader2,
-  Lock,
-  MessageCircle,
-  ShieldCheck,
-} from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { BookOpen, Crown, Loader2, Lock, ShieldCheck } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import AuthModal from "../components/AuthModal";
@@ -88,17 +82,22 @@ function PremiumGate({ onLogin }: { onLogin: () => void }) {
       >
         Log In to Access
       </Button>
-      <p className="text-xs text-muted-foreground mt-3 font-sans">
-        Not a member? Pay ₹500/year via UPI · 9582376290@ptaxis
-      </p>
+      <Link
+        to="/payment"
+        className="mt-3 inline-flex items-center justify-center px-6 py-2 rounded-full border text-sm font-sans font-semibold transition-colors hover:bg-card"
+        style={{
+          borderColor: "oklch(0.72 0.11 74 / 0.4)",
+          color: "oklch(0.72 0.11 74)",
+        }}
+        data-ocid="ebooks.goto_payment.link"
+      >
+        Go to Payment
+      </Link>
     </motion.div>
   );
 }
 
 function PremiumLockedGate() {
-  const whatsappUrl =
-    "https://wa.me/919220561379?text=Hi%2C%20I%20have%20paid%20for%20premium%20access%20and%20would%20like%20my%20account%20approved.";
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -120,112 +119,22 @@ function PremiumLockedGate() {
       <h2 className="font-serif text-2xl font-bold text-foreground mb-2">
         Premium Access Required
       </h2>
-      <p className="text-muted-foreground font-sans text-sm max-w-md mb-6">
-        You are logged in, but your account hasn't been approved for premium
-        access yet. Follow the steps below to get access.
+      <p className="text-muted-foreground font-sans text-sm max-w-md mb-8">
+        Complete your payment to unlock premium access to all E-Books.
       </p>
-
-      <div
-        className="w-full max-w-md rounded-xl border p-5 mb-6 text-left"
-        style={{
-          backgroundColor: "oklch(0.20 0.028 243)",
-          borderColor: "oklch(0.30 0.028 243)",
-        }}
-      >
-        <p
-          className="text-xs font-sans font-semibold tracking-widest uppercase mb-4"
-          style={{ color: "oklch(0.72 0.11 74)" }}
-        >
-          How to Get Premium Access
-        </p>
-        <ol className="flex flex-col gap-3">
-          {[
-            {
-              step: "1",
-              text: (
-                <>
-                  Pay{" "}
-                  <span className="font-semibold text-foreground">
-                    ₹500/year
-                  </span>{" "}
-                  via UPI to{" "}
-                  <span
-                    className="font-mono font-semibold"
-                    style={{ color: "oklch(0.72 0.11 74)" }}
-                  >
-                    9582376290@ptaxis
-                  </span>
-                </>
-              ),
-            },
-            {
-              step: "2",
-              text: (
-                <>
-                  Send your{" "}
-                  <span className="font-semibold text-foreground">name</span>{" "}
-                  and a{" "}
-                  <span className="font-semibold text-foreground">
-                    payment screenshot
-                  </span>{" "}
-                  on WhatsApp to{" "}
-                  <span
-                    className="font-semibold"
-                    style={{ color: "oklch(0.72 0.11 74)" }}
-                  >
-                    9220561379
-                  </span>
-                </>
-              ),
-            },
-            {
-              step: "3",
-              text: (
-                <>
-                  Admin will{" "}
-                  <span className="font-semibold text-foreground">
-                    approve your account
-                  </span>{" "}
-                  — you'll get full access to all e-books and Zoom meetings.
-                </>
-              ),
-            },
-          ].map(({ step, text }) => (
-            <li key={step} className="flex items-start gap-3">
-              <span
-                className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold font-sans mt-0.5"
-                style={{
-                  backgroundColor: "oklch(0.72 0.11 74 / 0.15)",
-                  color: "oklch(0.72 0.11 74)",
-                }}
-              >
-                {step}
-              </span>
-              <span className="text-sm font-sans text-muted-foreground leading-relaxed">
-                {text}
-              </span>
-            </li>
-          ))}
-        </ol>
-      </div>
 
       <Button
         asChild
-        className="font-sans font-semibold rounded-full px-8"
+        size="lg"
+        className="font-sans font-semibold rounded-full px-10 py-5 text-base"
         style={{
-          backgroundColor: "oklch(0.55 0.18 145)",
-          color: "white",
+          backgroundColor: "oklch(0.72 0.11 74)",
+          color: "oklch(0.12 0.028 243)",
         }}
-        data-ocid="ebooks.whatsapp.button"
+        data-ocid="ebooks.goto_payment.button"
       >
-        <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-          <MessageCircle className="w-4 h-4 mr-2" />
-          Message on WhatsApp
-        </a>
+        <Link to="/payment">Go to Payment</Link>
       </Button>
-      <p className="text-xs text-muted-foreground mt-3 font-sans">
-        Already sent the screenshot? Please wait for admin approval.
-      </p>
     </motion.div>
   );
 }

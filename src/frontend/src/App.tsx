@@ -10,7 +10,9 @@ import {
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import Admin from "./pages/Admin";
+import Courses from "./pages/Courses";
 import Ebooks from "./pages/Ebooks";
+import FAQs from "./pages/FAQs";
 import Geopolitics from "./pages/Geopolitics";
 import Home from "./pages/Home";
 import Masterclasses from "./pages/Masterclasses";
@@ -26,7 +28,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Root layout
 const rootRoute = createRootRoute({
   component: () => (
     <div
@@ -72,10 +73,20 @@ const adminRoute = createRoute({
   path: "/admin",
   component: Admin,
 });
+const coursesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/courses",
+  component: Courses,
+});
 const paymentRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/payment",
   component: Payment,
+});
+const faqsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/faqs",
+  component: FAQs,
 });
 
 const routeTree = rootRoute.addChildren([
@@ -86,6 +97,8 @@ const routeTree = rootRoute.addChildren([
   zoomMeetingsRoute,
   adminRoute,
   paymentRoute,
+  coursesRoute,
+  faqsRoute,
 ]);
 
 const router = createRouter({ routeTree });

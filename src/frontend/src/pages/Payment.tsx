@@ -57,9 +57,19 @@ const COUPONS: Record<string, { discount: number; label: string }> = {
   WAR25: { discount: 25, label: "WAR25" },
 };
 
-const BASE_PRICE = 500;
+function getSearchParams() {
+  const params = new URLSearchParams(window.location.search);
+  const price = params.get("price");
+  const item = params.get("item");
+  return {
+    basePrice: price ? Number.parseInt(price, 10) : 500,
+    itemName: item ? decodeURIComponent(item) : null,
+  };
+}
 
 export default function Payment() {
+  const { basePrice: BASE_PRICE, itemName } = getSearchParams();
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -114,9 +124,14 @@ export default function Payment() {
     });
   };
 
+  const productLabel = itemName ? itemName : "Advay Tyagi Academy Masterclass";
+  const productDescription = itemName
+    ? "Course access — all content included"
+    : "Annual access — all content included";
+
   const handleConfirmPay = () => {
     const msg = encodeURIComponent(
-      `Hi, I have made the payment for Advay Tyagi Academy Masterclass.\nName: ${form.name}\nEmail: ${form.email}\nPhone: +91${form.phone}\nAmount Paid: ₹${finalAmount}\nCoupon Used: ${
+      `Hi, I have made the payment for ${productLabel}.\nName: ${form.name}\nEmail: ${form.email}\nPhone: +91${form.phone}\nAmount Paid: ₹${finalAmount}\nCoupon Used: ${
         appliedCoupon ? appliedCoupon.code : "None"
       }`,
     );
@@ -132,7 +147,8 @@ export default function Payment() {
             Complete Your Enrollment
           </h1>
           <p className="font-sans text-muted-foreground text-sm sm:text-base">
-            Fill in your details below and pay via UPI to join the Masterclass.
+            Fill in your details below and pay via UPI to join{" "}
+            {itemName ? itemName : "the Masterclass"}.
           </p>
         </div>
 
@@ -372,10 +388,10 @@ export default function Payment() {
               <div className="flex items-start justify-between">
                 <div>
                   <p className="font-sans text-sm text-foreground font-medium">
-                    Advay Tyagi Academy Masterclass
+                    {productLabel}
                   </p>
                   <p className="font-sans text-xs text-muted-foreground mt-0.5">
-                    Annual access — all content included
+                    {productDescription}
                   </p>
                 </div>
                 <span className="font-sans text-sm text-foreground font-semibold">

@@ -10,18 +10,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Principal } from "@icp-sdk/core/principal";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  ArrowRightLeft,
-  Loader2,
-  ShieldCheck,
-  ShieldX,
-  UserPlus,
-  Users,
-} from "lucide-react";
+import { Loader2, ShieldCheck, ShieldX, UserPlus, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useActor } from "../hooks/useActor";
 import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import { isAdminPrincipal } from "../lib/adminUtils";
 
 export default function Admin() {
   const { actor, isFetching } = useActor();
@@ -30,20 +24,10 @@ export default function Admin() {
   const isAuthenticated = !!identity;
   const queryClient = useQueryClient();
   const [principalInput, setPrincipalInput] = useState("");
-  const [newAdminInput, setNewAdminInput] = useState("");
 
-  const { data: isAdmin, isLoading: checkingAdmin } = useQuery({
-    queryKey: ["isAdmin"],
-    queryFn: async () => {
-      if (!actor) return false;
-      try {
-        return await actor.isCallerAdmin();
-      } catch {
-        return false;
-      }
-    },
-    enabled: !!actor && !isFetching && isAuthenticated,
-  });
+  // Frontend-side admin check using hardcoded principal
+  const principalStr = identity?.getPrincipal().toString();
+  const isFrontendAdmin = isAdminPrincipal(principalStr);
 
   const { data: premiumUsers = [], isLoading: loadingUsers } = useQuery<
     Principal[]
@@ -51,9 +35,13 @@ export default function Admin() {
     queryKey: ["premiumUsers"],
     queryFn: async () => {
       if (!backendActor) return [];
-      return backendActor.getAllPremiumUsers();
+      try {
+        return await backendActor.getAllPremiumUsers();
+      } catch {
+        return [];
+      }
     },
-    enabled: !!actor && !isFetching && isAdmin === true,
+    enabled: !!actor && !isFetching && isFrontendAdmin,
   });
 
   const grantMutation = useMutation({
@@ -86,50 +74,26 @@ export default function Admin() {
     },
   });
 
-  const transferAdminMutation = useMutation({
-    mutationFn: async (principalStr: string) => {
-      if (!backendActor) throw new Error("Not connected");
-      const principal = Principal.fromText(principalStr);
-      await backendActor.transferAdmin(principal);
-    },
-    onSuccess: () => {
-      toast.success("Admin transferred. You are now a regular user.");
-      setNewAdminInput("");
-      queryClient.invalidateQueries({ queryKey: ["isAdmin"] });
-    },
-    onError: (err: Error) => {
-      toast.error(`Failed: ${err.message}`);
-    },
-  });
-
   const handleGrant = (e: React.FormEvent) => {
     e.preventDefault();
     if (!principalInput.trim()) return;
     grantMutation.mutate(principalInput.trim());
   };
 
-  const handleTransferAdmin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newAdminInput.trim()) return;
-    transferAdminMutation.mutate(newAdminInput.trim());
-  };
-
-  if (!isAuthenticated || checkingAdmin || isFetching) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-16">
         <div className="flex flex-col items-center gap-3 text-muted-foreground">
           <Loader2 className="w-8 h-8 animate-spin" />
           <span className="font-sans text-sm">
-            {!isAuthenticated
-              ? "Please log in to access the admin panel."
-              : "Checking authorization..."}
+            Please log in to access the admin panel.
           </span>
         </div>
       </div>
     );
   }
 
-  if (isAdmin === false) {
+  if (!isFrontendAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-16">
         <Card
@@ -210,58 +174,6 @@ export default function Admin() {
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   "Grant Premium"
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* Replace Admin */}
-        <Card
-          className="border"
-          style={{
-            backgroundColor: "oklch(0.16 0.025 243)",
-            borderColor: "oklch(0.32 0.08 25)",
-          }}
-        >
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <ArrowRightLeft
-                className="w-5 h-5"
-                style={{ color: "oklch(0.65 0.18 25)" }}
-              />
-              <CardTitle className="font-serif text-lg text-foreground">
-                Replace Admin
-              </CardTitle>
-            </div>
-            <CardDescription className="font-sans text-muted-foreground text-sm">
-              Transfer admin to a new Principal ID. You will lose admin access
-              after this action.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleTransferAdmin} className="flex gap-3">
-              <Input
-                placeholder="New admin Principal ID"
-                value={newAdminInput}
-                onChange={(e) => setNewAdminInput(e.target.value)}
-                className="flex-1 font-mono text-sm bg-card border-border text-foreground placeholder:text-muted-foreground/60"
-              />
-              <Button
-                type="submit"
-                disabled={
-                  transferAdminMutation.isPending || !newAdminInput.trim()
-                }
-                className="font-sans font-semibold px-5 shrink-0"
-                style={{
-                  backgroundColor: "oklch(0.45 0.18 25)",
-                  color: "white",
-                }}
-              >
-                {transferAdminMutation.isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  "Transfer"
                 )}
               </Button>
             </form>

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import {
   AlertCircle,
   CheckCircle2,
@@ -432,9 +433,6 @@ function FAQsView() {
 }
 
 function PremiumLockedGate() {
-  const whatsappUrl =
-    "https://wa.me/919220561379?text=Hi%2C%20I%20have%20paid%20for%20premium%20access%20and%20would%20like%20my%20account%20approved.";
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -456,113 +454,22 @@ function PremiumLockedGate() {
       <h2 className="font-serif text-2xl font-bold text-foreground mb-2">
         Premium Access Required
       </h2>
-      <p className="text-muted-foreground font-sans text-sm max-w-md mb-6">
-        You are logged in, but your account hasn't been approved for premium
-        access yet. Follow the steps below to get access to all Zoom meetings.
+      <p className="text-muted-foreground font-sans text-sm max-w-md mb-8">
+        Complete your payment to unlock access to all Zoom Meeting sessions.
       </p>
-
-      <div
-        className="w-full max-w-md rounded-xl border p-5 mb-6 text-left"
-        style={{
-          backgroundColor: "oklch(0.22 0.008 240)",
-          borderColor: "oklch(0.30 0.028 243)",
-        }}
-      >
-        <p
-          className="text-xs font-sans font-semibold tracking-widest uppercase mb-4"
-          style={{ color: "oklch(0.72 0.11 74)" }}
-        >
-          How to Get Premium Access
-        </p>
-        <ol className="flex flex-col gap-3">
-          {[
-            {
-              step: "1",
-              text: (
-                <>
-                  Pay{" "}
-                  <span className="font-semibold text-foreground">
-                    ₹500/year
-                  </span>{" "}
-                  via UPI to{" "}
-                  <span
-                    className="font-mono font-semibold"
-                    style={{ color: "oklch(0.72 0.11 74)" }}
-                  >
-                    9582376290@ptaxis
-                  </span>
-                </>
-              ),
-            },
-            {
-              step: "2",
-              text: (
-                <>
-                  Send your{" "}
-                  <span className="font-semibold text-foreground">name</span>{" "}
-                  and a{" "}
-                  <span className="font-semibold text-foreground">
-                    payment screenshot
-                  </span>{" "}
-                  on WhatsApp to{" "}
-                  <span
-                    className="font-semibold"
-                    style={{ color: "oklch(0.72 0.11 74)" }}
-                  >
-                    9220561379
-                  </span>
-                </>
-              ),
-            },
-            {
-              step: "3",
-              text: (
-                <>
-                  Admin will{" "}
-                  <span className="font-semibold text-foreground">
-                    approve your account
-                  </span>{" "}
-                  — you'll instantly get access to all monthly live sessions and
-                  e-books.
-                </>
-              ),
-            },
-          ].map(({ step, text }) => (
-            <li key={step} className="flex items-start gap-3">
-              <span
-                className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold font-sans mt-0.5"
-                style={{
-                  backgroundColor: "oklch(0.72 0.11 74 / 0.15)",
-                  color: "oklch(0.72 0.11 74)",
-                }}
-              >
-                {step}
-              </span>
-              <span className="text-sm font-sans text-muted-foreground leading-relaxed">
-                {text}
-              </span>
-            </li>
-          ))}
-        </ol>
-      </div>
 
       <Button
         asChild
-        className="font-sans font-semibold rounded-full px-8"
+        size="lg"
+        className="font-sans font-semibold rounded-full px-10 py-5 text-base"
         style={{
-          backgroundColor: "oklch(0.55 0.18 145)",
-          color: "white",
+          backgroundColor: "oklch(0.72 0.11 74)",
+          color: "oklch(0.12 0.028 243)",
         }}
-        data-ocid="zoom.whatsapp.button"
+        data-ocid="zoom.goto_payment.button"
       >
-        <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-          <MessageCircle className="w-4 h-4 mr-2" />
-          Message on WhatsApp
-        </a>
+        <Link to="/payment">Go to Payment</Link>
       </Button>
-      <p className="text-xs text-muted-foreground mt-3 font-sans">
-        Already sent the screenshot? Please wait for admin approval.
-      </p>
     </motion.div>
   );
 }
@@ -603,32 +510,34 @@ function MeetingsView() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="rounded-2xl border flex gap-4 items-start p-5 mb-8"
+        className="rounded-2xl border flex gap-4 items-center justify-between p-5 mb-8 flex-wrap"
         style={{
           backgroundColor: "oklch(0.72 0.11 74 / 0.08)",
           borderColor: "oklch(0.72 0.11 74 / 0.35)",
         }}
         data-ocid="zoom.notice.card"
       >
-        <AlertCircle
-          className="w-5 h-5 shrink-0 mt-0.5"
-          style={{ color: "oklch(0.72 0.11 74)" }}
-        />
         <p
-          className="text-sm font-sans leading-relaxed"
+          className="text-sm font-sans leading-relaxed flex-1"
           style={{ color: "oklch(0.85 0.06 74)" }}
         >
-          <span className="font-semibold text-gold">To join meetings:</span> Pay{" "}
-          <span className="font-semibold">₹500/year</span> via UPI to{" "}
-          <span className="font-mono font-semibold text-gold">
-            9582376290@ptaxis
-          </span>
-          , then send <span className="font-semibold">your name</span> (as it
-          will appear in Zoom) and a{" "}
-          <span className="font-semibold">screenshot of payment</span> on
-          WhatsApp to{" "}
-          <span className="font-semibold text-gold">9220561379</span>.
+          <span className="font-semibold text-gold">
+            Premium Access Required
+          </span>{" "}
+          — Complete your payment to join live Zoom sessions each month.
         </p>
+        <Button
+          asChild
+          size="sm"
+          className="font-sans font-semibold rounded-full px-6 shrink-0"
+          style={{
+            backgroundColor: "oklch(0.72 0.11 74)",
+            color: "oklch(0.12 0.028 243)",
+          }}
+          data-ocid="zoom.notice.goto_payment.button"
+        >
+          <Link to="/payment">Go to Payment</Link>
+        </Button>
       </motion.div>
 
       {isLoading && (
